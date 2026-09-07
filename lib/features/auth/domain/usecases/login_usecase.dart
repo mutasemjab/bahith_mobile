@@ -6,7 +6,7 @@ class LoginUseCase {
   const LoginUseCase(this._repository);
 
   ApiResult<AuthPayload> call({
-    required String phone,
+    required String nationalId,
     required String password,
-  }) => _repository.login(phone: phone, password: password);
+  }) => _repository.login(nationalId: nationalId, password: password);
 }

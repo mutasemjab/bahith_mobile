@@ -7,13 +7,13 @@ typedef AuthPayload = ({String token, StudentEntity student});
 
 abstract class AuthRepository {
   Future<Either<Failure, AuthPayload>> login({
-    required String phone,
+    required String nationalId,
     required String password,
   });
 
   Future<Either<Failure, AuthPayload>> register({
     required String name,
-    required String phone,
+    required String nationalId,
     required String password,
     required String passwordConfirmation,
     String? email,

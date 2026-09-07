@@ -37,9 +37,15 @@ class AuthCubit extends Cubit<AuthState> {
     await _resolveConductGate(student);
   }
 
-  Future<void> login({required String phone, required String password}) async {
+  Future<void> login({
+    required String nationalId,
+    required String password,
+  }) async {
     emit(const AuthLoading());
-    final result = await _loginUseCase(phone: phone, password: password);
+    final result = await _loginUseCase(
+      nationalId: nationalId,
+      password: password,
+    );
     await result.fold<Future<void>>(
       (failure) async => emit(_toError(failure)),
       (data) => _resolveConductGate(data.student),
@@ -48,7 +54,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> register({
     required String name,
-    required String phone,
+    required String nationalId,
     required String password,
     required String passwordConfirmation,
     String? email,
@@ -57,7 +63,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(const AuthLoading());
     final result = await _registerUseCase(
       name: name,
-      phone: phone,
+      nationalId: nationalId,
       password: password,
       passwordConfirmation: passwordConfirmation,
       email: email,

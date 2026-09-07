@@ -21,7 +21,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
+  final _nationalIdController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
 
@@ -29,7 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
+    _nationalIdController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
@@ -40,7 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = _emailController.text.trim();
     context.read<AuthCubit>().register(
       name: _nameController.text.trim(),
-      phone: _phoneController.text.trim(),
+      nationalId: _nationalIdController.text.trim(),
       password: _passwordController.text,
       passwordConfirmation: _confirmController.text,
       email: email.isEmpty ? null : email,
@@ -105,14 +105,14 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
-                    controller: _phoneController,
-                    label: 'رقم الهاتف',
-                    hint: '07xxxxxxxx',
-                    icon: Icons.phone_outlined,
-                    keyboardType: TextInputType.phone,
+                    controller: _nationalIdController,
+                    label: 'الرقم الوطني',
+                    hint: 'أدخل الرقم الوطني',
+                    icon: Icons.badge_outlined,
+                    keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     validator: (v) => (v == null || v.trim().length < 8)
-                        ? 'أدخل رقم هاتف صحيح'
+                        ? 'أدخل رقماً وطنياً صحيحاً'
                         : null,
                   ),
                   const SizedBox(height: 16),

@@ -17,13 +17,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, AuthPayload>> login({
-    required String phone,
+    required String nationalId,
     required String password,
   }) async {
     try {
       final deviceId = await _storage.getOrCreateDeviceId();
       final data = await _remote.login(
-        phone: phone,
+        nationalId: nationalId,
         password: password,
         deviceId: deviceId,
       );
@@ -36,7 +36,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, AuthPayload>> register({
     required String name,
-    required String phone,
+    required String nationalId,
     required String password,
     required String passwordConfirmation,
     String? email,
@@ -46,7 +46,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final deviceId = await _storage.getOrCreateDeviceId();
       final data = await _remote.register(
         name: name,
-        phone: phone,
+        nationalId: nationalId,
         password: password,
         passwordConfirmation: passwordConfirmation,
         deviceId: deviceId,

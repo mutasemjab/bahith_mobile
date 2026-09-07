@@ -7,14 +7,14 @@ class RegisterUseCase {
 
   ApiResult<AuthPayload> call({
     required String name,
-    required String phone,
+    required String nationalId,
     required String password,
     required String passwordConfirmation,
     String? email,
     int? classId,
   }) => _repository.register(
     name: name,
-    phone: phone,
+    nationalId: nationalId,
     password: password,
     passwordConfirmation: passwordConfirmation,
     email: email,

@@ -43,7 +43,7 @@ void main() {
     );
     final cubit = buildCubit(auth, conduct);
 
-    await cubit.login(phone: '0790000000', password: 'password123');
+    await cubit.login(nationalId: '0790000000', password: 'password123');
 
     expect(cubit.state, isA<AuthConductRequired>());
     await cubit.close();
@@ -142,14 +142,14 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<Either<Failure, AuthPayload>> login({
-    required String phone,
+    required String nationalId,
     required String password,
   }) async => Right((token: 'token', student: student));
 
   @override
   Future<Either<Failure, AuthPayload>> register({
     required String name,
-    required String phone,
+    required String nationalId,
     required String password,
     required String passwordConfirmation,
     String? email,

@@ -3,14 +3,14 @@ import '../../../../core/api/api_endpoints.dart';
 
 abstract class AuthRemoteDataSource {
   Future<Map<String, dynamic>> login({
-    required String phone,
+    required String nationalId,
     required String password,
     required String deviceId,
   });
 
   Future<Map<String, dynamic>> register({
     required String name,
-    required String phone,
+    required String nationalId,
     required String password,
     required String passwordConfirmation,
     required String deviceId,
@@ -31,18 +31,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> login({
-    required String phone,
+    required String nationalId,
     required String password,
     required String deviceId,
   }) async {
     final response = await _api.post(
       ApiEndpoints.login,
       data: {
-        // The deployed API still names its account-identifier field
-        // `national_id`. New accounts use the phone number as that internal
-        // identifier, so no separate government identifier is collected.
-        'national_id': phone,
-        'phone': phone,
+        'national_id': nationalId,
         'password': password,
         'deviceId': deviceId,
       },
@@ -53,7 +49,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<Map<String, dynamic>> register({
     required String name,
-    required String phone,
+    required String nationalId,
     required String password,
     required String passwordConfirmation,
     required String deviceId,
@@ -64,10 +60,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       ApiEndpoints.register,
       data: {
         'name': name,
-        // Compatibility bridge for the current backend contract. This is the
-        // same phone number entered below, not a separate personal identifier.
-        'national_id': phone,
-        'phone': phone,
+        'national_id': nationalId,
         'password': password,
         'password_confirmation': passwordConfirmation,
         'deviceId': deviceId,

@@ -19,12 +19,12 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _nationalIdController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _nationalIdController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     context.read<AuthCubit>().login(
-      phone: _phoneController.text.trim(),
+      nationalId: _nationalIdController.text.trim(),
       password: _passwordController.text,
     );
   }
@@ -72,14 +72,14 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 36),
                   AppTextField(
-                    controller: _phoneController,
-                    label: 'رقم الهاتف',
-                    hint: '07xxxxxxxx',
-                    icon: Icons.phone_outlined,
-                    keyboardType: TextInputType.phone,
+                    controller: _nationalIdController,
+                    label: 'الرقم الوطني',
+                    hint: 'أدخل الرقم الوطني',
+                    icon: Icons.badge_outlined,
+                    keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     validator: (v) => (v == null || v.trim().length < 8)
-                        ? 'أدخل رقم هاتف صحيح'
+                        ? 'أدخل رقماً وطنياً صحيحاً'
                         : null,
                   ),
                   const SizedBox(height: 18),
