@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "981552066394",
+    "project_id": "bahith-465f9",
+    "storage_bucket": "bahith-465f9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981552066394:android:c904f8765c875ebccd4d63",
+        "android_client_info": {
+          "package_name": "com.baheth.school"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBT3SvvBe60CJClw78kQ650yWFbzAJLrkI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
