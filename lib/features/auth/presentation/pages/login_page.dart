@@ -78,9 +78,6 @@ class _LoginPageState extends State<LoginPage> {
                     icon: Icons.badge_outlined,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) => (v == null || v.trim().length < 8)
-                        ? 'أدخل رقماً وطنياً صحيحاً'
-                        : null,
                   ),
                   const SizedBox(height: 18),
                   AppTextField(

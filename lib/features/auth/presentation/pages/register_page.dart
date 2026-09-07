@@ -111,9 +111,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     icon: Icons.badge_outlined,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) => (v == null || v.trim().length < 8)
-                        ? 'أدخل رقماً وطنياً صحيحاً'
-                        : null,
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
