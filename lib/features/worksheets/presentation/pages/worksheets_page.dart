@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/service_locator.dart';
@@ -6,19 +7,32 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/widgets/paginated_list_view.dart';
 import '../../../../core/widgets/pdf_resource_tile.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../auth/presentation/cubit/auth_state.dart';
 import '../../domain/entities/worksheet_entity.dart';
 import '../cubit/worksheets_cubit.dart';
 
 class WorksheetsPage extends StatefulWidget {
-  const WorksheetsPage({super.key});
+  final int subjectId;
+  final String? subjectName;
+
+  const WorksheetsPage({super.key, required this.subjectId, this.subjectName});
 
   @override
   State<WorksheetsPage> createState() => _WorksheetsPageState();
 }
 
 class _WorksheetsPageState extends State<WorksheetsPage> {
-  late final WorksheetsCubit _cubit = sl<WorksheetsCubit>()..loadFirstPage();
+  late final WorksheetsCubit _cubit = sl<WorksheetsCubit>()
+    ..subjectId = widget.subjectId
+    ..classId = _studentClassId()
+    ..loadFirstPage();
   final _searchController = TextEditingController();
+
+  int? _studentClassId() {
+    final state = context.read<AuthCubit>().state;
+    return state is AuthAuthenticated ? state.student.classId : null;
+  }
 
   @override
   void dispose() {
@@ -30,7 +44,7 @@ class _WorksheetsPageState extends State<WorksheetsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('أوراق العمل')),
+      appBar: AppBar(title: Text(widget.subjectName ?? 'أوراق العمل')),
       body: Column(
         children: [
           Padding(

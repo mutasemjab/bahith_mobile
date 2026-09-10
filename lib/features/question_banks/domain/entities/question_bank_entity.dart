@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class QuestionBankEntity extends Equatable {
   final int id;
   final String title;
+  final int? subjectId;
   final String? subjectName;
   final String? fileUrl;
   final String? description;
@@ -12,6 +13,7 @@ class QuestionBankEntity extends Equatable {
   const QuestionBankEntity({
     required this.id,
     required this.title,
+    this.subjectId,
     this.subjectName,
     this.fileUrl,
     this.description,

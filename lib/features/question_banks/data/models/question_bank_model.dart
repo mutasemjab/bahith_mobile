@@ -5,6 +5,7 @@ class QuestionBankModel extends QuestionBankEntity {
   const QuestionBankModel({
     required super.id,
     required super.title,
+    super.subjectId,
     super.subjectName,
     super.fileUrl,
     super.description,
@@ -13,10 +14,12 @@ class QuestionBankModel extends QuestionBankEntity {
   });
 
   factory QuestionBankModel.fromJson(Map<String, dynamic> json) {
+    final subject = json['subject'];
     return QuestionBankModel(
       id: json['id'],
       title: json['title'] ?? '',
-      subjectName: relatedName(json['subject']) ?? json['subject_name'],
+      subjectId: toIntOrNull(subject is Map ? subject['id'] : null),
+      subjectName: relatedName(subject) ?? json['subject_name'],
       fileUrl: json['pdf_url'] ?? json['file_url'] ?? json['file'],
       description: json['description'],
       pages: json['pages'] ?? 0,

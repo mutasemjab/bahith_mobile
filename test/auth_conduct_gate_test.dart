@@ -163,6 +163,10 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, AuthPayload>> switchSibling(int siblingId) async =>
+      Right((token: 'token', student: student));
+
+  @override
   Future<Either<Failure, void>> deleteAccount() async => const Right(null);
 
   @override

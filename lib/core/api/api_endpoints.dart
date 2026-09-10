@@ -9,6 +9,8 @@ class ApiEndpoints {
   static const login = '/auth/login';
   static const logout = '/auth/logout';
   static const deleteAccount = '/auth/delete-account';
+  static String switchSibling(int siblingId) =>
+      '/auth/switch-sibling/$siblingId';
 
   // App settings (public)
   static const appSettings = '/app-settings';
@@ -65,6 +67,11 @@ class ApiEndpoints {
 
   // Educational Notes
   static const educationalNotes = '/educational-notes';
+
+  // Planner & schedules
+  static const weeklyPlanner = '/weekly-planner';
+  static const classSchedule = '/class-schedule';
+  static const examSchedule = '/exam-schedule';
 
   // Announcements
   static const announcements = '/announcements';

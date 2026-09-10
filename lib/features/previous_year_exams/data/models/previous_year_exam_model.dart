@@ -5,6 +5,7 @@ class PreviousYearExamModel extends PreviousYearExamEntity {
   const PreviousYearExamModel({
     required super.id,
     required super.title,
+    super.subjectId,
     super.subjectName,
     super.year,
     super.fileUrl,
@@ -12,10 +13,12 @@ class PreviousYearExamModel extends PreviousYearExamEntity {
   });
 
   factory PreviousYearExamModel.fromJson(Map<String, dynamic> json) {
+    final subject = json['subject'];
     return PreviousYearExamModel(
       id: json['id'],
       title: json['title'] ?? '',
-      subjectName: relatedName(json['subject']) ?? json['subject_name'],
+      subjectId: toIntOrNull(subject is Map ? subject['id'] : null),
+      subjectName: relatedName(subject) ?? json['subject_name'],
       year: json['year'],
       fileUrl: json['pdf_url'] ?? json['file_url'] ?? json['file'],
       description: json['description'],

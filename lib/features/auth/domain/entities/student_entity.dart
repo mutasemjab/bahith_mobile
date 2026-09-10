@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import 'sibling_entity.dart';
+
 class StudentEntity extends Equatable {
   final int id;
   final String name;
@@ -16,6 +18,9 @@ class StudentEntity extends Equatable {
   final String? appAccountToken;
   final bool isActive;
 
+  /// Accounts linked to this one by an admin, for one-tap switching.
+  final List<SiblingEntity> siblings;
+
   const StudentEntity({
     required this.id,
     required this.name,
@@ -29,6 +34,7 @@ class StudentEntity extends Equatable {
     this.nationality,
     this.appAccountToken,
     required this.isActive,
+    this.siblings = const [],
   });
 
   @override

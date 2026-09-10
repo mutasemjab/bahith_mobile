@@ -9,6 +9,7 @@ import '../../domain/repositories/worksheet_repository.dart';
 class WorksheetsCubit extends PaginatedCubit<WorksheetEntity> {
   final WorksheetRepository _repository;
   String? searchQuery;
+  int? classId;
   int? year;
   int? subjectId;
 
@@ -24,6 +25,7 @@ class WorksheetsCubit extends PaginatedCubit<WorksheetEntity> {
     int page,
   ) => _repository.getAll(
     page: page,
+    classId: classId,
     subjectId: subjectId,
     year: year,
     search: searchQuery,

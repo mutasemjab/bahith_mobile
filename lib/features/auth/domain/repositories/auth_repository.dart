@@ -24,6 +24,8 @@ abstract class AuthRepository {
 
   Future<Either<Failure, void>> deleteAccount();
 
+  Future<Either<Failure, AuthPayload>> switchSibling(int siblingId);
+
   Future<Either<Failure, StudentEntity>> refreshStudent();
 
   Future<bool> isLoggedIn();

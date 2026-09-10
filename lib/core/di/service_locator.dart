@@ -59,10 +59,17 @@ import '../../features/question_banks/data/repositories/question_bank_repository
 import '../../features/question_banks/domain/repositories/question_bank_repository.dart';
 import '../../features/question_banks/presentation/cubit/question_bank_detail_cubit.dart';
 import '../../features/question_banks/presentation/cubit/question_banks_cubit.dart';
+import '../../features/schedules/data/repositories/schedule_repository_impl.dart';
+import '../../features/schedules/domain/repositories/schedule_repository.dart';
+import '../../features/schedules/presentation/cubit/class_schedule_cubit.dart';
+import '../../features/schedules/presentation/cubit/exam_schedule_cubit.dart';
 import '../../features/teachers/data/repositories/teacher_repository_impl.dart';
 import '../../features/teachers/domain/repositories/teacher_repository.dart';
 import '../../features/teachers/presentation/cubit/teacher_detail_cubit.dart';
 import '../../features/teachers/presentation/cubit/teachers_cubit.dart';
+import '../../features/weekly_planner/data/repositories/weekly_planner_repository_impl.dart';
+import '../../features/weekly_planner/domain/repositories/weekly_planner_repository.dart';
+import '../../features/weekly_planner/presentation/cubit/weekly_planner_cubit.dart';
 import '../../features/worksheets/data/repositories/worksheet_repository_impl.dart';
 import '../../features/worksheets/domain/repositories/worksheet_repository.dart';
 import '../../features/worksheets/presentation/cubit/worksheet_detail_cubit.dart';
@@ -171,6 +178,19 @@ Future<void> setupServiceLocator() async {
   // Educational notes
   sl.registerLazySingleton<NoteRepository>(() => NoteRepositoryImpl(sl()));
   sl.registerFactory(() => NotesCubit(sl()));
+
+  // Class & exam schedules
+  sl.registerLazySingleton<ScheduleRepository>(
+    () => ScheduleRepositoryImpl(sl()),
+  );
+  sl.registerFactory(() => ClassScheduleCubit(sl()));
+  sl.registerFactory(() => ExamScheduleCubit(sl()));
+
+  // Weekly planner
+  sl.registerLazySingleton<WeeklyPlannerRepository>(
+    () => WeeklyPlannerRepositoryImpl(sl()),
+  );
+  sl.registerFactory(() => WeeklyPlannerCubit(sl()));
 
   // Profile
   sl.registerLazySingleton<ProfileRepository>(

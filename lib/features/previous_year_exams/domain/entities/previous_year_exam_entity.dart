@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class PreviousYearExamEntity extends Equatable {
   final int id;
   final String title;
+  final int? subjectId;
   final String? subjectName;
   final int? year;
   final String? fileUrl;
@@ -11,6 +12,7 @@ class PreviousYearExamEntity extends Equatable {
   const PreviousYearExamEntity({
     required this.id,
     required this.title,
+    this.subjectId,
     this.subjectName,
     this.year,
     this.fileUrl,

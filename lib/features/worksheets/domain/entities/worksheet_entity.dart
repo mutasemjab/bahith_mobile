@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class WorksheetEntity extends Equatable {
   final int id;
   final String title;
+  final int? subjectId;
   final String? subjectName;
   final int? year;
   final String? fileUrl;
@@ -11,6 +12,7 @@ class WorksheetEntity extends Equatable {
   const WorksheetEntity({
     required this.id,
     required this.title,
+    this.subjectId,
     this.subjectName,
     this.year,
     this.fileUrl,

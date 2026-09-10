@@ -71,6 +71,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, AuthPayload>> switchSibling(int siblingId) async {
+    try {
+      final data = await _remote.switchSibling(siblingId);
+      return Right(await _persist(data));
+    } on DioException catch (e) {
+      return Left(mapDioError(e));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> logout() async {
     try {
       await _remote.logout();

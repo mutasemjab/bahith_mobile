@@ -9,6 +9,7 @@ import '../../domain/repositories/previous_year_exam_repository.dart';
 class PreviousYearExamsCubit extends PaginatedCubit<PreviousYearExamEntity> {
   final PreviousYearExamRepository _repository;
   String? searchQuery;
+  int? classId;
   int? year;
   int? subjectId;
 
@@ -29,6 +30,7 @@ class PreviousYearExamsCubit extends PaginatedCubit<PreviousYearExamEntity> {
     int page,
   ) => _repository.getAll(
     page: page,
+    classId: classId,
     subjectId: subjectId,
     year: year,
     search: searchQuery,

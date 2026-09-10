@@ -75,6 +75,24 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
+  /// Switches to a linked sibling account with no re-entered credentials.
+  /// Returns an Arabic error message on failure so the switcher sheet can
+  /// stay open and show it; returns null on success (the new session is
+  /// already persisted and emitted by the time this resolves).
+  Future<String?> switchSibling(int siblingId) async {
+    emit(const AuthLoading());
+    final result = await _repository.switchSibling(siblingId);
+    String? errorMessage;
+    await result.fold<Future<void>>(
+      (failure) async {
+        errorMessage = failure.message;
+        emit(_toError(failure));
+      },
+      (data) => _resolveConductGate(data.student),
+    );
+    return errorMessage;
+  }
+
   Future<void> logout() async {
     await _repository.logout();
     emit(const AuthUnauthenticated());

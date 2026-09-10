@@ -25,16 +25,21 @@ import '../../features/files/presentation/pages/files_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/previous_year_exams/presentation/pages/previous_year_exam_detail_page.dart';
+import '../../features/previous_year_exams/presentation/pages/previous_year_exam_subjects_page.dart';
 import '../../features/previous_year_exams/presentation/pages/previous_year_exams_page.dart';
 import '../../features/profile/presentation/pages/edit_profile_page.dart';
 import '../../features/profile/presentation/pages/my_courses_page.dart';
 import '../../features/profile/presentation/pages/my_exams_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/question_banks/presentation/pages/question_bank_detail_page.dart';
+import '../../features/question_banks/presentation/pages/question_bank_subjects_page.dart';
 import '../../features/question_banks/presentation/pages/question_banks_page.dart';
+import '../../features/schedules/presentation/pages/class_schedule_page.dart';
+import '../../features/schedules/presentation/pages/exam_schedule_page.dart';
 import '../../features/teachers/presentation/pages/teacher_detail_page.dart';
 import '../../features/teachers/presentation/pages/teachers_page.dart';
 import '../../features/worksheets/presentation/pages/worksheet_detail_page.dart';
+import '../../features/worksheets/presentation/pages/worksheet_subjects_page.dart';
 import '../../features/worksheets/presentation/pages/worksheets_page.dart';
 import '../di/service_locator.dart';
 import 'app_shell.dart';
@@ -207,7 +212,15 @@ GoRouter buildAppRouter() {
       GoRoute(
         path: '/previous-year-exams',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (_, _) => const PreviousYearExamsPage(),
+        builder: (_, _) => const PreviousYearExamSubjectsPage(),
+      ),
+      GoRoute(
+        path: '/previous-year-exams/list',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, state) => PreviousYearExamsPage(
+          subjectId: int.parse(state.uri.queryParameters['subject_id']!),
+          subjectName: state.uri.queryParameters['subject_name'],
+        ),
       ),
       GoRoute(
         path: '/previous-year-exams/:id',
@@ -219,7 +232,15 @@ GoRouter buildAppRouter() {
       GoRoute(
         path: '/question-banks',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (_, _) => const QuestionBanksPage(),
+        builder: (_, _) => const QuestionBankSubjectsPage(),
+      ),
+      GoRoute(
+        path: '/question-banks/list',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, state) => QuestionBanksPage(
+          subjectId: int.parse(state.uri.queryParameters['subject_id']!),
+          subjectName: state.uri.queryParameters['subject_name'],
+        ),
       ),
       GoRoute(
         path: '/question-banks/:id',
@@ -231,7 +252,15 @@ GoRouter buildAppRouter() {
       GoRoute(
         path: '/worksheets',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (_, _) => const WorksheetsPage(),
+        builder: (_, _) => const WorksheetSubjectsPage(),
+      ),
+      GoRoute(
+        path: '/worksheets/list',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, state) => WorksheetsPage(
+          subjectId: int.parse(state.uri.queryParameters['subject_id']!),
+          subjectName: state.uri.queryParameters['subject_name'],
+        ),
       ),
       GoRoute(
         path: '/worksheets/:id',
@@ -249,6 +278,16 @@ GoRouter buildAppRouter() {
         path: '/educational-notes',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (_, _) => const EducationalNotesPage(),
+      ),
+      GoRoute(
+        path: '/class-schedule',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, _) => const ClassSchedulePage(),
+      ),
+      GoRoute(
+        path: '/exam-schedule',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, _) => const ExamSchedulePage(),
       ),
       GoRoute(
         path: '/announcements/:id',

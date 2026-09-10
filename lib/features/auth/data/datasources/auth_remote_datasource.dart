@@ -23,6 +23,8 @@ abstract class AuthRemoteDataSource {
   Future<void> deleteAccount();
 
   Future<Map<String, dynamic>> profile();
+
+  Future<Map<String, dynamic>> switchSibling(int siblingId);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -84,6 +86,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<Map<String, dynamic>> profile() async {
     final response = await _api.get(ApiEndpoints.profile);
+    return response.data['data'] as Map<String, dynamic>;
+  }
+
+  @override
+  Future<Map<String, dynamic>> switchSibling(int siblingId) async {
+    final response = await _api.post(ApiEndpoints.switchSibling(siblingId));
     return response.data['data'] as Map<String, dynamic>;
   }
 }

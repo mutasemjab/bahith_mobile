@@ -1,4 +1,5 @@
 import '../../domain/entities/student_entity.dart';
+import 'sibling_model.dart';
 
 class StudentModel extends StudentEntity {
   const StudentModel({
@@ -14,6 +15,7 @@ class StudentModel extends StudentEntity {
     super.nationality,
     super.appAccountToken,
     required super.isActive,
+    super.siblings,
   });
 
   factory StudentModel.fromJson(Map<String, dynamic> json) => StudentModel(
@@ -29,5 +31,8 @@ class StudentModel extends StudentEntity {
     nationality: json['nationality'],
     appAccountToken: json['app_account_token']?.toString(),
     isActive: json['is_active'] ?? true,
+    siblings: (json['siblings'] as List<dynamic>? ?? [])
+        .map((e) => SiblingModel.fromJson(e as Map<String, dynamic>))
+        .toList(),
   );
 }
