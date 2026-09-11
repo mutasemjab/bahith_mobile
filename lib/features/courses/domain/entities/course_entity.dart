@@ -59,6 +59,10 @@ class CourseEntity extends Equatable {
   final double? progress;
   final List<CourseUnitEntity> units;
 
+  /// Whether this course can be bought (card code or App Store) at all —
+  /// `false` for free courses, which open without any purchase step.
+  final bool canPurchaseViaStore;
+
   const CourseEntity({
     required this.id,
     required this.title,
@@ -83,6 +87,7 @@ class CourseEntity extends Equatable {
     this.isEnrolled = false,
     this.progress,
     this.units = const [],
+    this.canPurchaseViaStore = true,
   });
 
   CourseEntity copyWith({bool? isEnrolled, double? progress}) {
@@ -110,6 +115,7 @@ class CourseEntity extends Equatable {
       isEnrolled: isEnrolled ?? this.isEnrolled,
       progress: progress ?? this.progress,
       units: units,
+      canPurchaseViaStore: canPurchaseViaStore,
     );
   }
 

@@ -25,6 +25,11 @@ class ContentLessonEntity extends Equatable {
   final int orderIndex;
   final bool isFree;
   final bool isLocked;
+
+  /// True when [isLocked] is specifically because the student hasn't
+  /// completed the previous lesson yet (sequential videos), as opposed to
+  /// not being enrolled/free — drives a different lock icon and message.
+  final bool isLockedBySequence;
   final String? videoUrl;
   final String? fileUrl;
 
@@ -36,6 +41,7 @@ class ContentLessonEntity extends Equatable {
     this.orderIndex = 0,
     this.isFree = false,
     this.isLocked = false,
+    this.isLockedBySequence = false,
     this.videoUrl,
     this.fileUrl,
   });

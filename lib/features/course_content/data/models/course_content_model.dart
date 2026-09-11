@@ -27,6 +27,7 @@ class ContentLessonModel extends ContentLessonEntity {
     super.orderIndex,
     super.isFree,
     super.isLocked,
+    super.isLockedBySequence,
     super.videoUrl,
     super.fileUrl,
   });
@@ -40,6 +41,7 @@ class ContentLessonModel extends ContentLessonEntity {
         orderIndex: json['order_index'] ?? 0,
         isFree: json['is_free'] ?? false,
         isLocked: json['is_locked'] ?? false,
+        isLockedBySequence: json['is_locked_by_sequence'] ?? false,
         videoUrl: json['video_url'],
         fileUrl: json['file_url'],
       );

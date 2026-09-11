@@ -310,7 +310,7 @@ class CourseDetailPage extends StatelessWidget {
                         ),
                         if (showCommerce &&
                             !course.isEnrolled &&
-                            (!usesAppleIap || !course.isFree)) ...[
+                            course.canPurchaseViaStore) ...[
                           const SizedBox(height: 12),
                           ElevatedButton.icon(
                             onPressed: () {

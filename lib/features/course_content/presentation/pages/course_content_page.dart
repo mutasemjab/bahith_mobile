@@ -70,8 +70,13 @@ class _CourseContentPageState extends State<CourseContentPage> {
           : '/lessons/${lesson.id}',
     );
     // The lesson may have just been marked completed / its position saved —
-    // refresh so the checkmarks and percentage reflect that immediately.
-    if (mounted) _progressCubit.load(widget.courseId);
+    // refresh progress so checkmarks/percentage update immediately, and
+    // reload the unit list too since completing a lesson can unlock the
+    // next one (sequential videos) and its `is_locked` flag lives there.
+    if (mounted) {
+      _progressCubit.load(widget.courseId);
+      _cubit.load(widget.courseId);
+    }
   }
 
   @override
@@ -321,6 +326,24 @@ class _UnitCard extends StatelessWidget {
   });
 
   void _openLesson(BuildContext context, ContentLessonEntity lesson) {
+    if (lesson.isLockedBySequence) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('الدرس مقفل'),
+          content: const Text(
+            'يجب إكمال الدرس السابق أولاً للوصول إلى هذا الدرس.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('حسناً'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
     if (lesson.isLocked) {
       final showCommerce = AppSettingsScope.of(context).showCommerce;
       showDialog(
@@ -430,20 +453,25 @@ class _UnitCard extends StatelessWidget {
               final resumeSeconds = progress?.resumeSecondsFor(lesson.id);
               return ListTile(
                 onTap: () => _openLesson(context, lesson),
-                leading: Icon(
-                  lesson.isLocked
-                      ? Icons.lock_rounded
-                      : isCompleted
-                      ? Icons.check_circle_rounded
-                      : lesson.lessonType == 'pdf'
-                      ? Icons.picture_as_pdf_rounded
-                      : Icons.play_circle_outline_rounded,
-                  color: lesson.isLocked
-                      ? AppColors.textMuted
-                      : isCompleted
-                      ? AppColors.success
-                      : AppColors.primary,
-                ),
+                leading: lesson.isLockedBySequence
+                    ? Tooltip(
+                        message: 'أكمل الدرس السابق أولاً',
+                        child: _SequenceLockBadge(order: lesson.orderIndex),
+                      )
+                    : Icon(
+                        lesson.isLocked
+                            ? Icons.lock_rounded
+                            : isCompleted
+                            ? Icons.check_circle_rounded
+                            : lesson.lessonType == 'pdf'
+                            ? Icons.picture_as_pdf_rounded
+                            : Icons.play_circle_outline_rounded,
+                        color: lesson.isLocked
+                            ? AppColors.textMuted
+                            : isCompleted
+                            ? AppColors.success
+                            : AppColors.primary,
+                      ),
                 title: Text(
                   lesson.title,
                   style: TextStyle(
@@ -499,6 +527,35 @@ class _UnitCard extends StatelessWidget {
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown instead of the usual lock icon when a lesson is locked
+/// specifically because sequential videos require finishing the previous
+/// one — surfaces its order number rather than a generic padlock.
+class _SequenceLockBadge extends StatelessWidget {
+  final int order;
+  const _SequenceLockBadge({required this.order});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: AppColors.textMuted.withValues(alpha: 0.12),
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$order',
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          color: AppColors.textMuted,
         ),
       ),
     );

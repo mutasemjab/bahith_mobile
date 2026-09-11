@@ -78,6 +78,7 @@ class CourseModel extends CourseEntity {
     super.isEnrolled,
     super.progress,
     super.units,
+    super.canPurchaseViaStore,
   });
 
   factory CourseModel.fromJson(
@@ -88,6 +89,7 @@ class CourseModel extends CourseEntity {
     final teacher = json['teacher'];
     final subject = json['subject'];
     final price = toDoubleOrNull(json['price']);
+    final isFree = json['is_free'] ?? (price == null || price == 0);
 
     return CourseModel(
       id: json['id'],
@@ -102,7 +104,8 @@ class CourseModel extends CourseEntity {
       price: price,
       oldPrice: toDoubleOrNull(json['old_price']),
       discountPercent: json['discount'],
-      isFree: json['is_free'] ?? (price == null || price == 0),
+      isFree: isFree,
+      canPurchaseViaStore: json['can_purchase_via_store'] ?? !isFree,
       rating: toDouble(json['average_rating'] ?? json['rating']),
       studentsCount: json['total_students'] ?? json['students_count'] ?? 0,
       lessonsCount: json['lessons_count'] ?? 0,
