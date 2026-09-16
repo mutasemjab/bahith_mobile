@@ -12,6 +12,11 @@ class NoteEntity extends Equatable {
   final String? teacherName;
   final String? className;
 
+  /// Every image attached to this note, in upload order — a note can now
+  /// carry more than one. [fileUrl] mirrors the first entry for backward
+  /// compatibility only; prefer this list.
+  final List<String> images;
+
   const NoteEntity({
     required this.id,
     required this.title,
@@ -22,6 +27,7 @@ class NoteEntity extends Equatable {
     this.date,
     this.teacherName,
     this.className,
+    this.images = const [],
   });
 
   bool get isHomework => type == 'homework';

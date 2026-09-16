@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/widgets/fullscreen_image_viewer.dart';
@@ -19,17 +20,19 @@ class NoteDetailPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
-          if (note.isImageAttachment)
+          if (note.images.length == 1)
             GestureDetector(
-              onTap: () => showFullscreenImage(context, note.fileUrl!),
+              onTap: () => showImageGallery(context, note.images),
               child: AppNetworkImage(
-                url: note.fileUrl,
+                url: note.images.first,
                 height: 220,
                 width: double.infinity,
                 radius: 0,
                 fallbackIcon: Icons.image_rounded,
               ),
-            ),
+            )
+          else if (note.images.length > 1)
+            _NoteImagesStrip(images: note.images),
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -129,6 +132,39 @@ class _MetaItem extends StatelessWidget {
           style: const TextStyle(fontSize: 12.5, color: AppColors.textMuted),
         ),
       ],
+    );
+  }
+}
+
+/// Horizontal thumbnail strip shown when a note has more than one image —
+/// tapping any thumbnail opens the swipeable gallery starting at it.
+class _NoteImagesStrip extends StatelessWidget {
+  final List<String> images;
+  const _NoteImagesStrip({required this.images});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 96,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.all(16),
+        itemCount: images.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (_, i) => GestureDetector(
+          onTap: () => showImageGallery(context, images, initialIndex: i),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+            child: AppNetworkImage(
+              url: images[i],
+              width: 96,
+              height: 96,
+              radius: AppRadius.sm,
+              fallbackIcon: Icons.image_rounded,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

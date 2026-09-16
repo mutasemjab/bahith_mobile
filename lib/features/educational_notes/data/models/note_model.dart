@@ -12,6 +12,7 @@ class NoteModel extends NoteEntity {
     super.date,
     super.teacherName,
     super.className,
+    super.images,
   });
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +31,9 @@ class NoteModel extends NoteEntity {
       date: DateTime.tryParse(json['date']?.toString() ?? ''),
       teacherName: (teacher is Map ? teacher['name']?.toString() : null),
       className: json['class']?.toString(),
+      images: (json['images'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toList(),
     );
   }
 }
