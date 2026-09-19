@@ -17,25 +17,19 @@ class NotesCubit extends Cubit<ResourceState<List<NoteDayGroupEntity>>> {
     );
   }
 
-  /// Groups notes by calendar day, drops days before today (the student
-  /// only needs today-onward here), and sorts ascending so today comes
-  /// first, matching how the notes screen is meant to be read.
+  /// Groups notes by calendar day, keeping the backend's order. No date
+  /// filtering or sorting happens here — the backend owns both.
   List<NoteDayGroupEntity> _groupByDay(List<NoteEntity> notes) {
-    final today = DateTime.now();
-    final todayDate = DateTime(today.year, today.month, today.day);
-
     final groups = <DateTime, List<NoteEntity>>{};
     for (final note in notes) {
       final date = note.date;
       if (date == null) continue;
       final day = DateTime(date.year, date.month, date.day);
-      if (day.isBefore(todayDate)) continue;
       groups.putIfAbsent(day, () => []).add(note);
     }
 
-    final days = groups.keys.toList()..sort();
-    return days
-        .map((day) => NoteDayGroupEntity(date: day, notes: groups[day]!))
+    return groups.entries
+        .map((e) => NoteDayGroupEntity(date: e.key, notes: e.value))
         .toList();
   }
 }
