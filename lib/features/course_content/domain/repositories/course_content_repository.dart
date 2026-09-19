@@ -11,11 +11,13 @@ abstract class CourseContentRepository {
     required int watchSeconds,
   });
 
-  /// Sent once, when the video ends — the response reports the course's
-  /// new completion percentage if it changed.
+  /// Sent once, when the video ends (or the student taps "done" on a
+  /// PDF-only lesson, which has no natural completion event of its own —
+  /// [watchSeconds] is meaningless there and left null). The response
+  /// reports the course's new completion percentage if it changed.
   ApiResult<LessonProgressResultEntity> completeLesson({
     required int lessonId,
-    required int watchSeconds,
+    int? watchSeconds,
   });
 
   ApiResult<CourseProgressEntity> getCourseProgress(int courseId);

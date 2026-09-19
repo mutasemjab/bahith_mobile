@@ -59,12 +59,12 @@ class CourseContentRepositoryImpl implements CourseContentRepository {
   @override
   ApiResult<LessonProgressResultEntity> completeLesson({
     required int lessonId,
-    required int watchSeconds,
+    int? watchSeconds,
   }) async {
     try {
       final response = await _api.post(
         ApiEndpoints.lessonProgress(lessonId),
-        data: {'watch_seconds': watchSeconds, 'is_completed': true},
+        data: {'watch_seconds': ?watchSeconds, 'is_completed': true},
       );
       final data = response.data['data'] as Map<String, dynamic>;
       return Right(LessonProgressResultModel.fromJson(data));

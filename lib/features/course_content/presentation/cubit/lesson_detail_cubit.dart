@@ -29,11 +29,12 @@ class LessonDetailCubit extends Cubit<ResourceState<LessonDetailEntity>> {
     );
   }
 
-  /// Sent once when the video ends. Returns the course's new completion
-  /// percentage when the server reports one, so the caller can refresh
-  /// anywhere else that shows it — null on failure (silent, same reasoning
-  /// as [savePosition]).
-  Future<int?> markCompleted(int lessonId, int watchSeconds) async {
+  /// Sent once when the video ends, or when the student taps "done" on a
+  /// PDF-only lesson ([watchSeconds] omitted — it has no video position).
+  /// Returns the course's new completion percentage when the server
+  /// reports one, so the caller can refresh anywhere else that shows it —
+  /// null on failure (silent, same reasoning as [savePosition]).
+  Future<int?> markCompleted(int lessonId, [int? watchSeconds]) async {
     final result = await _repository.completeLesson(
       lessonId: lessonId,
       watchSeconds: watchSeconds,

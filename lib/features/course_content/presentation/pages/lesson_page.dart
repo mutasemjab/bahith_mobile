@@ -126,6 +126,26 @@ class _LessonContentState extends State<_LessonContent>
   /// nothing else is watching for changes to second-guess it.
   bool _isFullScreen = false;
 
+  /// PDF-only lessons have no natural "finished" event the way a video
+  /// does, so completion is reported manually via this button instead.
+  bool _pdfCompleting = false;
+
+  Future<void> _completePdfLesson() async {
+    setState(() => _pdfCompleting = true);
+    await _progressCubit.markCompleted(widget.lesson.id);
+    if (!mounted) return;
+    setState(() {
+      _pdfCompleting = false;
+      _completionSent = true;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('تم إكمال الدرس 🎉'),
+        backgroundColor: AppColors.success,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -277,7 +297,41 @@ class _LessonContentState extends State<_LessonContent>
           ),
         ),
         body: lesson.hasFile
-            ? PdfViewerBody(url: lesson.fileUrl!)
+            ? Column(
+                children: [
+                  Expanded(child: PdfViewerBody(url: lesson.fileUrl!)),
+                  SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: ElevatedButton.icon(
+                        onPressed: _pdfCompleting || _completionSent
+                            ? null
+                            : _completePdfLesson,
+                        icon: _pdfCompleting
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Icon(
+                                _completionSent
+                                    ? Icons.check_circle_rounded
+                                    : Icons.check_rounded,
+                              ),
+                        label: Text(
+                          _completionSent
+                              ? 'تم إكمال الدرس'
+                              : 'تم الانتهاء من الدرس',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
             : const AppErrorView(message: 'لا يوجد محتوى متاح لهذا الدرس بعد'),
       );
     }
