@@ -4,12 +4,14 @@ import '../../../../core/cubit/resource_state.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/utils/extensions.dart';
-import '../../../../core/widgets/fullscreen_image_viewer.dart';
 import '../../../weekly_planner/domain/entities/weekly_planner_entity.dart';
+import '../../../weekly_planner/presentation/pages/weekly_planner_page.dart';
 
 /// A single home card for the latest weekly planner — hidden entirely
 /// while loading, on error, or when none matches the student's class and
-/// current date window (all normal, non-error outcomes here).
+/// current date window (all normal, non-error outcomes here). Tapping it
+/// opens a page with the Arabic title+image, then the English title+image,
+/// stacked top to bottom.
 class WeeklyPlannerCard extends StatelessWidget {
   final ResourceState<WeeklyPlannerEntity?> state;
 
@@ -32,7 +34,11 @@ class WeeklyPlannerCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.md),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          onTap: () => showFullscreenImage(context, planner.imageUrl),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => WeeklyPlannerPage(planner: planner),
+            ),
+          ),
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
