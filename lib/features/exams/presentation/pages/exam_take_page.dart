@@ -6,6 +6,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/app_error_view.dart';
+import '../../../../core/widgets/app_network_image.dart';
+import '../../../../core/widgets/fullscreen_image_viewer.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../domain/entities/exam_entity.dart';
 import '../cubit/exam_cubit.dart';
@@ -207,6 +209,21 @@ class _ExamQuestionsView extends StatelessWidget {
                       color: AppColors.textPrimary,
                     ),
                   ),
+                  if (question.image != null) ...[
+                    const SizedBox(height: 14),
+                    GestureDetector(
+                      onTap: () =>
+                          showFullscreenImage(context, question.image!),
+                      child: AppNetworkImage(
+                        url: question.image,
+                        height: 180,
+                        width: double.infinity,
+                        radius: AppRadius.sm,
+                        fit: BoxFit.contain,
+                        fallbackIcon: Icons.image_rounded,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 18),
                   ...question.options.map((option) {
                     final isSelected = selected == option.id;
