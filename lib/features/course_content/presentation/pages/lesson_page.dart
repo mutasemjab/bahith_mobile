@@ -114,16 +114,13 @@ class _LessonContentState extends State<_LessonContent>
   YoutubePlayerController? _youtubeController;
   TabController? _tabController;
   Timer? _progressTimer;
+  StreamSubscription<YoutubePlayerValue>? _playerSubscription;
+  StreamSubscription<YoutubeVideoState>? _videoSubscription;
+  Duration _position = Duration.zero;
   late final LessonDetailCubit _progressCubit;
   bool _completionSent = false;
 
-  /// Fullscreen is driven entirely by this flag rather than
-  /// `YoutubePlayerBuilder`'s automatic device-orientation detection —
-  /// that package mechanism kept snapping back to portrait right after
-  /// expanding, because its own metrics listener and our system-UI calls
-  /// ended up racing each other. A single explicit toggle button is far
-  /// more predictable: we control orientation and layout directly and
-  /// nothing else is watching for changes to second-guess it.
+  // Track the player fullscreen state to restore orientation on exit.
   bool _isFullScreen = false;
 
   /// PDF-only lessons have no natural "finished" event the way a video
@@ -152,16 +149,26 @@ class _LessonContentState extends State<_LessonContent>
     _progressCubit = context.read<LessonDetailCubit>();
     final lesson = widget.lesson;
     if (lesson.hasVideo) {
-      final videoId = YoutubePlayer.convertUrlToId(lesson.videoUrl!);
+      final videoId = YoutubePlayerController.convertUrlToId(lesson.videoUrl!);
       if (videoId != null) {
-        _youtubeController = YoutubePlayerController(
-          initialVideoId: videoId,
-          flags: YoutubePlayerFlags(
-            autoPlay: true,
-            mute: false,
-            startAt: widget.resumeSeconds ?? 0,
-          ),
-        )..addListener(_onPlayerStateChange);
+        final controller = YoutubePlayerController.fromVideoId(
+          videoId: videoId,
+          autoPlay: true,
+          startSeconds: (widget.resumeSeconds ?? 0).toDouble(),
+        );
+        _youtubeController = controller;
+        _playerSubscription = controller.stream.listen((value) {
+          final fullScreen = value.fullScreenOption.enabled;
+          if (_isFullScreen != fullScreen) {
+            _isFullScreen = fullScreen;
+            _setOrientationAndChrome(fullScreen: fullScreen);
+          }
+          _onPlayerStateChange();
+        });
+        _videoSubscription = controller.videoStateStream.listen((value) {
+          _position = value.position;
+          _onPlayerStateChange();
+        });
         _startProgressTimer();
       }
     }
@@ -176,11 +183,9 @@ class _LessonContentState extends State<_LessonContent>
   void _startProgressTimer() {
     _progressTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       final controller = _youtubeController;
-      if (controller != null && controller.value.isPlaying) {
-        _progressCubit.savePosition(
-          widget.lesson.id,
-          controller.value.position.inSeconds,
-        );
+      if (controller != null &&
+          controller.value.playerState == PlayerState.playing) {
+        _progressCubit.savePosition(widget.lesson.id, _position.inSeconds);
       }
     });
   }
@@ -196,7 +201,7 @@ class _LessonContentState extends State<_LessonContent>
     // completion isn't missed just because that event never fires.
     final nearEnd =
         duration > Duration.zero &&
-        controller.value.position >= duration - const Duration(seconds: 2);
+        _position >= duration - const Duration(seconds: 2);
     final finished =
         state == PlayerState.ended || (state == PlayerState.paused && nearEnd);
     if (!finished) return;
@@ -204,7 +209,7 @@ class _LessonContentState extends State<_LessonContent>
     _completionSent = true;
     final seconds = duration > Duration.zero
         ? duration.inSeconds
-        : controller.value.position.inSeconds;
+        : _position.inSeconds;
     _progressCubit.markCompleted(widget.lesson.id, seconds).then((_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -219,14 +224,15 @@ class _LessonContentState extends State<_LessonContent>
   @override
   void dispose() {
     _progressTimer?.cancel();
+    _playerSubscription?.cancel();
+    _videoSubscription?.cancel();
     final controller = _youtubeController;
     if (controller != null) {
-      controller.removeListener(_onPlayerStateChange);
       // Save the last known position on the way out — otherwise closing
       // the screen mid-video (before the next 30s tick) loses that
       // watch time entirely.
       if (!_completionSent) {
-        final seconds = controller.value.position.inSeconds;
+        final seconds = _position.inSeconds;
         if (seconds > 5) {
           _progressCubit.savePosition(widget.lesson.id, seconds);
         }
@@ -236,7 +242,7 @@ class _LessonContentState extends State<_LessonContent>
     // Safety net: never leave the rest of the app stuck sideways if this
     // screen is disposed while still in fullscreen.
     if (_isFullScreen) _setOrientationAndChrome(fullScreen: false);
-    controller?.dispose();
+    controller?.close();
     super.dispose();
   }
 
@@ -255,31 +261,6 @@ class _LessonContentState extends State<_LessonContent>
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     }
   }
-
-  void _toggleFullScreen() {
-    final next = !_isFullScreen;
-    setState(() => _isFullScreen = next);
-    _setOrientationAndChrome(fullScreen: next);
-  }
-
-  List<Widget> _controls() => [
-    const SizedBox(width: 14),
-    const CurrentPosition(),
-    const SizedBox(width: 8),
-    const ProgressBar(isExpanded: true),
-    const RemainingDuration(),
-    const PlaybackSpeedButton(),
-    IconButton(
-      padding: EdgeInsets.zero,
-      icon: Icon(
-        _isFullScreen
-            ? Icons.fullscreen_exit_rounded
-            : Icons.fullscreen_rounded,
-        color: Colors.white,
-      ),
-      onPressed: _toggleFullScreen,
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -338,62 +319,44 @@ class _LessonContentState extends State<_LessonContent>
 
     final player = YoutubePlayer(
       controller: controller,
-      showVideoProgressIndicator: true,
-      bottomActions: _controls(),
+      autoFullScreen: false,
+      enableFullScreenOnVerticalDrag: false,
     );
 
-    return PopScope(
-      canPop: !_isFullScreen,
-      onPopInvokedWithResult: (didPop, _) {
-        if (didPop) return;
-        // Back button while fullscreen exits fullscreen first, matching
-        // the native YouTube app, instead of leaving the lesson outright.
-        _toggleFullScreen();
-      },
-      child: _isFullScreen
-          ? Scaffold(
-              backgroundColor: Colors.black,
-              body: SafeArea(child: Center(child: player)),
-            )
-          : Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  lesson.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              body: !lesson.hasFile
-                  ? player
-                  : Column(
-                      children: [
-                        TabBar(
-                          controller: _tabController,
-                          labelColor: AppColors.primary,
-                          unselectedLabelColor: AppColors.textMuted,
-                          indicatorColor: AppColors.primary,
-                          tabs: const [
-                            Tab(
-                              icon: Icon(Icons.play_circle_outline_rounded),
-                              text: 'الفيديو',
-                            ),
-                            Tab(
-                              icon: Icon(Icons.picture_as_pdf_rounded),
-                              text: 'الملف',
-                            ),
-                          ],
-                        ),
-                        Expanded(
-                          child: TabBarView(
-                            controller: _tabController,
-                            children: [
-                              player,
-                              PdfViewerBody(url: lesson.fileUrl!),
-                            ],
-                          ),
-                        ),
-                      ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(lesson.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+      ),
+      body: !lesson.hasFile
+          ? player
+          : Column(
+              children: [
+                TabBar(
+                  controller: _tabController,
+                  labelColor: AppColors.primary,
+                  unselectedLabelColor: AppColors.textMuted,
+                  indicatorColor: AppColors.primary,
+                  tabs: const [
+                    Tab(
+                      icon: Icon(Icons.play_circle_outline_rounded),
+                      text: 'الفيديو',
                     ),
+                    Tab(
+                      icon: Icon(Icons.picture_as_pdf_rounded),
+                      text: 'الملف',
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      player,
+                      PdfViewerBody(url: lesson.fileUrl!),
+                    ],
+                  ),
+                ),
+              ],
             ),
     );
   }
